@@ -19,19 +19,13 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     []
   );
   const { documentId } = React.use(params);
-  if (!documentId) {
-    return <div>Invalid document ID</div>;
-  }
   const document = useQuery(api.documents.getById, {
     documentId: documentId as Id<"documents">,
   });
   const update = useMutation(api.documents.update);
-  const onChange = (content: string) => {
-    update({
-      id: documentId as Id<"documents">,
-      content,
-    });
-  };
+  if (!documentId) {
+    return <div>Invalid document ID</div>;
+  }
 
   if (document === undefined) {
     return (
@@ -51,6 +45,12 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   if (document === null) {
     return <div>Not Found</div>;
   }
+  const onChange = (content: string) => {
+    update({
+      id: documentId as Id<"documents">,
+      content,
+    });
+  };
   return (
     <div className="pb-40">
       <Cover url={document.coverImage} />

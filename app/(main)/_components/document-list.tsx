@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Item } from "./item";
 import { cn } from "@/lib/utils";
-import { Ban, FileIcon } from "lucide-react";
+import { FileIcon } from "lucide-react";
 
 interface DocumentListProps {
   parentDocumentId?: Id<"documents">;

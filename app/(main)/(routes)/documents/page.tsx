@@ -41,7 +41,7 @@ const DocumentsPage = () => {
         />
       </div>
       <h2 className="text-xl md:text-2xl font-medium">
-        Welcome {user?.fullName}, let's get your thoughts out
+        Welcome {user?.fullName}, let&apos;s get your thoughts out
       </h2>
       <Button size="lg" onClick={onCreate}>
         <PlusCircle className="h-4 w-4 mr-1 mt-0.5" />
