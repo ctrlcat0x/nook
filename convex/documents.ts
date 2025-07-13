@@ -29,12 +29,14 @@ export const archive = mutation({
       for (const child of children) {
         await ctx.db.patch(child._id, {
           isArchived: true,
+          lastEdited: Date.now(),
         });
         await recursiveArchive(child._id);
       }
     };
     const document = await ctx.db.patch(args.id, {
       isArchived: true,
+      lastEdited: Date.now(),
     });
     recursiveArchive(args.id);
 
@@ -81,6 +83,8 @@ export const create = mutation({
       userId,
       isArchived: false,
       isPublished: false,
+      lastEdited: Date.now(),
+      isFavorite: false, // default
     });
     return document;
   },
@@ -129,12 +133,14 @@ export const restore = mutation({
       for (const child of children) {
         await ctx.db.patch(child._id, {
           isArchived: false,
+          lastEdited: Date.now(),
         });
         await recursiveRestore(child._id);
       }
     };
     const options: Partial<Doc<"documents">> = {
       isArchived: false,
+      lastEdited: Date.now(),
     };
     if (existingDocument.parentDocument) {
       const parent = await ctx.db.get(existingDocument.parentDocument);
@@ -217,6 +223,7 @@ export const update = mutation({
     coverImage: v.optional(v.string()),
     icon: v.optional(v.string()),
     isPublished: v.optional(v.boolean()),
+    isFavorite: v.optional(v.boolean()), // allow updating favourite
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -235,6 +242,7 @@ export const update = mutation({
     }
     const document = await ctx.db.patch(args.id, {
       ...rest,
+      lastEdited: Date.now(),
     });
     return document;
   },
@@ -280,5 +288,61 @@ export const removeCover = mutation({
       coverImage: undefined,
     });
     return document;
+  },
+});
+
+export const getRecent = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const userId = identity.subject;
+    const documents = await ctx.db
+      .query("documents")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("isArchived"), false))
+      .order("desc")
+      .collect();
+    return documents.sort((a, b) => b.lastEdited - a.lastEdited).slice(0, 5);
+  },
+});
+
+// Toggle favorite mutation
+export const toggleFavorite = mutation({
+  args: { id: v.id("documents") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const userId = identity.subject;
+    const doc = await ctx.db.get(args.id);
+    if (!doc) throw new Error("Not Found");
+    if (doc.userId !== userId) throw new Error("Unauthorized");
+    const updated = await ctx.db.patch(args.id, {
+      isFavorite: !doc.isFavorite,
+      lastEdited: Date.now(),
+    });
+    return updated;
+  },
+});
+
+// Get all favorites (not archived), sorted by lastEdited
+export const getFavorites = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const userId = identity.subject;
+    const documents = await ctx.db
+      .query("documents")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("isArchived"), false),
+          q.eq(q.field("isFavorite"), true)
+        )
+      )
+      .order("desc")
+      .collect();
+    return documents.sort((a, b) => b.lastEdited - a.lastEdited);
   },
 });

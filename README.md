@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nook: Your Cozy Corner for Big Ideas
 
-## Getting Started
+Nook is a modern, full-stack web application for personal knowledge management, note-taking, and document organization. It is designed for a beautiful, fast, and collaborative user experience, leveraging the latest in React, Next.js, Convex, and modern UI/UX frameworks.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Table of Contents
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Main Features](#main-features)
+- [User Flows](#user-flows)
+- [Advanced Capabilities](#advanced-capabilities)
+- [Development & Contribution](#development--contribution)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- **Frontend:** React 19, Next.js 15 (App Router, SSR/SSG, API routes)
+- **Styling:** TailwindCSS, Shadcn UI, Radix UI, Lucide Icons
+- **State Management:** Zustand, React Context, usehooks-ts
+- **Authentication:** Clerk.dev (with ClerkProvider)
+- **Database & Backend:** Convex (serverless, real-time, type-safe)
+- **File Storage:** EdgeStore (for cover images, file uploads)
+- **Rich Text Editor:** BlockNote (with image upload integration)
+- **Notifications:** Sonner
+- **Other:** SWR, Zod, Emoji Picker, Next Themes (dark/light mode)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `app/` — Next.js App Router pages, layouts, and route groups
+  - `(landing)/` — Public landing page and marketing
+  - `(main)/` — Main authenticated app (documents, navigation, trash, etc.)
+  - `(public)/` — Public document sharing routes
+- `components/` — UI components (toolbar, modals, editor, buttons, etc.)
+- `convex/` — Convex backend functions, schema, and data model
+- `hooks/` — Custom React hooks (settings, search, scroll, cover image, etc.)
+- `lib/` — Utility functions and EdgeStore provider
+- `public/` — Static assets (images, icons, favicons)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Main Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Authentication:** Secure sign-in/sign-up with Clerk
+- **Document Creation:** Create, edit, and organize notes/pages in a nested tree
+- **Rich Text Editing:** BlockNote editor with support for text, images, and formatting
+- **Cover Images:** Upload, change, or remove cover images for documents (EdgeStore integration)
+- **Emoji/Icon Picker:** Add custom icons to documents using an emoji picker
+- **Sidebar Navigation:** Hierarchical, collapsible sidebar for document navigation
+- **Trash & Restore:** Soft-delete (archive) documents, restore or permanently delete from Trash
+- **Search:** Command palette (Ctrl+K) for fast document search and navigation
+- **Document Sharing:** Publish notes to the web with a public URL; unpublish at any time
+- **Dark/Light Mode:** User-selectable theme with system preference support
+- **Settings Modal:** User preferences and appearance settings
+- **Notifications:** Toasts for all major actions (create, delete, publish, upload, etc.)
+- **Accessibility:** Keyboard navigation, ARIA roles, focus management, and accessible UI components
+
+---
+
+## User Flows
+
+### 1. **Authentication**
+
+- Users must sign in via Clerk to access the main app.
+- Unauthenticated users see a landing page with marketing and sign-in options.
+
+### 2. **Document Management**
+
+- Create a new note from the dashboard or sidebar.
+- Edit the note title inline, add content with the rich text editor.
+- Organize notes in a nested (parent/child) structure.
+- Add icons and cover images for visual organization.
+
+### 3. **Trash & Restore**
+
+- Delete (archive) notes to move them to Trash.
+- Restore or permanently delete notes from Trash.
+- "Empty Trash" to delete all trashed notes at once.
+
+### 4. **Search & Navigation**
+
+- Use the sidebar to browse and expand/collapse document trees.
+- Use the command palette (Ctrl+K) to search and jump to any note.
+
+### 5. **Document Sharing**
+
+- Publish any note to generate a public, shareable URL.
+- Unpublish to make the note private again.
+
+### 6. **Customization & Settings**
+
+- Toggle dark/light mode.
+- Access settings modal for appearance and other preferences.
+
+---
+
+## Advanced Capabilities
+
+- **Real-Time Data:** All document changes are synced in real-time via Convex.
+- **File Uploads:** Cover images and editor images are uploaded and managed via EdgeStore.
+- **Rich Editor:** BlockNote provides a Notion-like editing experience, including image uploads.
+- **Emoji Picker:** Add expressive icons to notes for quick visual identification.
+- **Accessibility:** All interactive elements are keyboard-accessible and screen-reader friendly.
+- **Responsive Design:** Fully responsive for desktop and mobile devices.
+
+---
+
+## Development & Contribution
+
+### Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+2. Set up environment variables for Clerk, Convex, and EdgeStore (see `.env.example` if present).
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Scripts
+
+- `npm run dev` — Start the development server
+- `npm run build` — Build for production
+- `npm run start` — Start the production server
+- `npm run lint` — Run ESLint
+
+### Deployment
+
+- Deploys seamlessly to [Vercel](https://vercel.com/)
+- Uses serverless functions and edge storage for scalability
+
+---
+
+## License
+
+This project is for educational and personal use. See LICENSE file if present.

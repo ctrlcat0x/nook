@@ -125,7 +125,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative">
         {disabled && (
-          <div className="absolute inset-y-0 z-50 flex h-full w-full items-center justify-center bg-background/80">
+          <div className="absolute inset-y-0 z-50 flex h-full w-full items-center justify-center bg-secondary/80">
             <Spinner size="lg" />
           </div>
         )}

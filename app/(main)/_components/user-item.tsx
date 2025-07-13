@@ -1,5 +1,5 @@
 "use client";
-import { ChevronsLeftRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -27,7 +27,7 @@ export const UserItem = () => {
               {user?.fullName}&apos;s Space
             </span>
           </div>
-          <ChevronsLeftRight className="rotate-90 ml-2 text-muted-foreground h-4 w-4" />
+          <ChevronDown className="mt-1 ml-2 text-muted-foreground h-4 w-4" />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent

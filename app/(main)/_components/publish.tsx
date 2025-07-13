@@ -70,7 +70,11 @@ export const Publish = ({ initialData }: PublishProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button size="sm">
+        <Button
+          size="sm"
+          variant="secondary"
+          className="text-secondary-foreground"
+        >
           {initialData.isPublished && (
             <div className="flex gap-x-2 items-center">
               <Globe className=" h-4 w-4 text-sky-400" />

@@ -2,7 +2,7 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, Star } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Title } from "./title";
 import { Banner } from "./banner";
@@ -12,6 +12,17 @@ import { Publish } from "./publish";
 interface NavbarProps {
   isCollapsed: boolean;
   onResetWidth: () => void;
+}
+
+function formatTimeAgo(date: number) {
+  const now = Date.now();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400)
+    return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? "s" : ""} ago`;
+  if (diff < 172800) return "yesterday";
+  return `${Math.floor(diff / 86400)} days ago`;
 }
 
 export const Navbar = ({ isCollapsed, onResetWidth }: NavbarProps) => {
@@ -45,6 +56,9 @@ export const Navbar = ({ isCollapsed, onResetWidth }: NavbarProps) => {
         <div className="flex items-center justify-between w-full">
           <Title initialData={document} />
           <div className="flex items-center gap-x-2">
+            <span className="text-sm text-muted-foreground mr-2">
+              Last edited: {formatTimeAgo(document.lastEdited)}
+            </span>
             <Publish initialData={document} />
             <Menu documentId={document._id} />
           </div>

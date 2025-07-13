@@ -2,12 +2,22 @@
 
 import {
   ChevronsLeft,
+  Home,
   MenuIcon,
   Plus,
-  PlusCircle,
   Search,
   Settings2,
-  Trash,
+  ChevronDown,
+  ChevronRight,
+  SquarePen,
+  MoreHorizontal,
+  ArrowUpAZ,
+  ArrowDownAZ,
+  Clock,
+  Trash2,
+  Check,
+  Lock,
+  Globe,
 } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
@@ -19,7 +29,13 @@ import { api } from "@/convex/_generated/api";
 import { Item } from "./item";
 import { toast } from "sonner";
 import { DocumentList } from "./document-list";
-import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenuSeparator,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverTrigger,
@@ -29,6 +45,8 @@ import { TrashBox } from "./trash-box";
 import { useSearch } from "@/hooks/use-search";
 import { useSettings } from "@/hooks/use-settings";
 import { Navbar } from "./navbar";
+import { useQuery } from "convex/react";
+import { Doc } from "@/convex/_generated/dataModel";
 
 export const Navigation = () => {
   const router = useRouter();
@@ -45,6 +63,23 @@ export const Navigation = () => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isReseting, setIsReseting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const [isPublicOpen, setIsPublicOpen] = useState(true);
+  const [isPrivateOpen, setIsPrivateOpen] = useState(true);
+  const allDocuments = useQuery(api.documents.getSearch);
+  const publicDocs =
+    allDocuments?.filter(
+      (doc: Doc<"documents">) => doc.isPublished && !doc.isArchived
+    ) || [];
+  const privateDocs =
+    allDocuments?.filter(
+      (doc: Doc<"documents">) => !doc.isPublished && !doc.isArchived
+    ) || [];
+  type PrivateSort = "az" | "za" | "lastEditedDesc" | "lastEditedAsc";
+  const [privateSort, setPrivateSort] = useState<PrivateSort>("lastEditedDesc");
+  const [sortPopoverOpen, setSortPopoverOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const moreRef = useRef<HTMLSpanElement>(null);
+  const plusRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isMobile) {
@@ -91,12 +126,12 @@ export const Navigation = () => {
     if (sidebarRef.current && navbarRef.current) {
       setIsCollapsed(false);
       setIsReseting(true);
-      sidebarRef.current.style.width = isMobile ? "100%" : "240px";
+      sidebarRef.current.style.width = isMobile ? "100%" : "280px";
       navbarRef.current.style.setProperty(
         "width",
-        isMobile ? "0" : "calc(100% - 240px)"
+        isMobile ? "0" : "calc(100% - 280px)"
       );
-      navbarRef.current.style.setProperty("left", isMobile ? "100%" : "240px");
+      navbarRef.current.style.setProperty("left", isMobile ? "100%" : "280px");
       setTimeout(() => setIsReseting(false), 300);
     }
   };
@@ -112,15 +147,34 @@ export const Navigation = () => {
     }
   };
   const handleCreate = () => {
-    const promise = create({ title: "Untitled" }).then((documentId) =>
-      router.push(`/documents/${documentId}`)
-    );
+    const promise = create({ title: "Untitled" }).then((documentId) => {
+      router.push(`/documents/${documentId}`);
+      plusRef.current?.blur();
+    });
     toast.promise(promise, {
       loading: "Creating a new note...",
       success: "New note created!",
       error: "Failed to create a new note",
     });
   };
+  const homePush = () => {
+    router.push(`/documents`);
+  };
+  // For sorting privateDocs before rendering:
+  const sortedPrivateDocs = [...privateDocs].sort((a, b) => {
+    switch (privateSort) {
+      case "az":
+        return a.title.localeCompare(b.title);
+      case "za":
+        return b.title.localeCompare(a.title);
+      case "lastEditedAsc":
+        return a.lastEdited - b.lastEdited;
+      case "lastEditedDesc":
+        return b.lastEdited - a.lastEdited;
+      default:
+        return b.lastEdited - a.lastEdited;
+    }
+  });
   return (
     <>
       <aside
@@ -141,19 +195,243 @@ export const Navigation = () => {
         >
           <ChevronsLeft className="h-6 w-6" />
         </div>
-        <div>
-          <UserItem />
+        <UserItem />
+        <div className="mx-2">
           <Item label="Search" icon={Search} isSearch onClick={search.onOpen} />
+          <Item label="Home" icon={Home} onClick={homePush} />
           <Item label="Settings" icon={Settings2} onClick={settings.onOpen} />
-          <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
-          <DropdownMenuSeparator className="mt-2" />
+          <Item label="Add a page" icon={SquarePen} onClick={handleCreate} />
+          <DropdownMenuSeparator className="my-2" />
         </div>
-        <div className="mt-2">
-          <DocumentList />
-          <Item onClick={handleCreate} icon={Plus} label="Add a page" />
+        <div className="mx-2">
+          {/* Public Section */}
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={isPublicOpen}
+            onClick={() => setIsPublicOpen((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setIsPublicOpen((v) => !v);
+            }}
+            className="flex items-center justify-between text-xs mb-2 p-1.5 text-muted-foreground font-semibold cursor-pointer group rounded-sm transition hover:bg-primary/5"
+          >
+            <div className="flex items-center gap-x-1">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <span>Public</span>
+            </div>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 ml-1 text-muted-foreground transition-transform opacity-0 group-hover:opacity-100",
+                isPublicOpen ? "rotate-0" : "-rotate-90"
+              )}
+            />
+          </div>
+          {isPublicOpen &&
+            (publicDocs.length > 0 ? (
+              <DocumentList data={publicDocs} />
+            ) : (
+              <div className="text-xs text-muted-foreground py-2 text-center">
+                No pages published
+              </div>
+            ))}
+          {/* Private Section */}
+          <div className="my-2"></div>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={isPrivateOpen}
+            className="flex items-center justify-between text-xs mb-2 p-1 text-muted-foreground font-semibold cursor-pointer group rounded-sm transition hover:bg-primary/5 focus-within:bg-primary/5"
+          >
+            <span
+              className="flex-1"
+              onClick={() => setIsPrivateOpen((v) => !v)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ")
+                  setIsPrivateOpen((v) => !v);
+              }}
+              tabIndex={0}
+              role="button"
+              aria-expanded={isPrivateOpen}
+            >
+              <div className="flex items-center gap-x-1">
+                <Lock className="h-4 w-4 text-muted-foreground" />
+                <span>Private</span>
+              </div>
+            </span>
+            <div className="flex items-center gap-x-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition">
+              <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                <DropdownMenuTrigger asChild>
+                  <span
+                    ref={moreRef}
+                    className="rounded-sm p-1 transition hover:bg-primary/5"
+                    onClick={(e) => e.stopPropagation()}
+                    tabIndex={0}
+                    aria-label="Private options"
+                  >
+                    <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  side="right"
+                  forceMount
+                  className="w-48"
+                >
+                  <DropdownMenuItem asChild>
+                    <Popover
+                      open={sortPopoverOpen}
+                      onOpenChange={setSortPopoverOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <div
+                          className={cn(
+                            "flex items-center w-full rounded-sm px-2 py-1.5 text-sm transition cursor-pointer select-none hover:bg-accent hover:text-accent-foreground",
+                            sortPopoverOpen &&
+                              "bg-accent text-accent-foreground"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSortPopoverOpen((v) => !v);
+                          }}
+                          tabIndex={0}
+                          role="menuitem"
+                          aria-haspopup="menu"
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          <span>Sort by</span>
+                          <span className="ml-auto text-xs text-muted-foreground font-normal">
+                            {privateSort === "az"
+                              ? "A-Z"
+                              : privateSort === "za"
+                                ? "Z-A"
+                                : privateSort === "lastEditedAsc"
+                                  ? "Oldest"
+                                  : "Newest"}
+                          </span>
+                          <ChevronRight className="h-4 w-4 ml-2 text-muted-foreground" />
+                        </div>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        side="right"
+                        alignOffset={4}
+                        className="w-56 p-2 ml-2 space-y-1"
+                      >
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                          Sort by
+                        </div>
+                        <button
+                          className={cn(
+                            "flex items-center w-full rounded px-2 py-1.5 text-sm transition hover:bg-primary/10",
+                            privateSort === "az" &&
+                              "bg-primary/10 font-semibold"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPrivateSort("az");
+                            setSortPopoverOpen(false);
+                            setDropdownOpen(false);
+                            moreRef.current?.blur();
+                          }}
+                        >
+                          <ArrowUpAZ className="h-4 w-4 mr-2" />
+                          Title: A-Z
+                          {privateSort === "az" && (
+                            <Check className="h-4 w-4 ml-auto text-primary" />
+                          )}
+                        </button>
+                        <button
+                          className={cn(
+                            "flex items-center w-full rounded px-2 py-1.5 text-sm transition hover:bg-primary/10",
+                            privateSort === "za" &&
+                              "bg-primary/10 font-semibold"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPrivateSort("za");
+                            setSortPopoverOpen(false);
+                            setDropdownOpen(false);
+                            moreRef.current?.blur();
+                          }}
+                        >
+                          <ArrowDownAZ className="h-4 w-4 mr-2" />
+                          Title: Z-A
+                          {privateSort === "za" && (
+                            <Check className="h-4 w-4 ml-auto text-primary" />
+                          )}
+                        </button>
+                        <button
+                          className={cn(
+                            "flex items-center w-full rounded px-2 py-1.5 text-sm transition hover:bg-primary/10",
+                            privateSort === "lastEditedDesc" &&
+                              "bg-primary/10 font-semibold"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPrivateSort("lastEditedDesc");
+                            setSortPopoverOpen(false);
+                            setDropdownOpen(false);
+                            moreRef.current?.blur();
+                          }}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Last Edited: Newest
+                          {privateSort === "lastEditedDesc" && (
+                            <Check className="h-4 w-4 ml-auto text-primary" />
+                          )}
+                        </button>
+                        <button
+                          className={cn(
+                            "flex items-center w-full rounded px-2 py-1.5 text-sm transition hover:bg-primary/10",
+                            privateSort === "lastEditedAsc" &&
+                              "bg-primary/10 font-semibold"
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPrivateSort("lastEditedAsc");
+                            setSortPopoverOpen(false);
+                            setDropdownOpen(false);
+                            moreRef.current?.blur();
+                          }}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Last Edited: Oldest
+                          {privateSort === "lastEditedAsc" && (
+                            <Check className="h-4 w-4 ml-auto text-primary" />
+                          )}
+                        </button>
+                      </PopoverContent>
+                    </Popover>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCreate();
+                }}
+                className="rounded-sm p-1 hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-ring"
+                tabIndex={0}
+                aria-label="Add a page"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+          {isPrivateOpen &&
+            (sortedPrivateDocs.length > 0 ? (
+              <DocumentList data={sortedPrivateDocs} />
+            ) : (
+              <div className="text-xs text-muted-foreground pl-3 pb-2">
+                No private pages
+              </div>
+            ))}
+          <DropdownMenuSeparator className="my-2" />
           <Popover>
-            <PopoverTrigger className="w-full mt-4">
-              <Item icon={Trash} label="Trash" />
+            <PopoverTrigger className="w-full">
+              <Item icon={Trash2} label="Trash" />
             </PopoverTrigger>
             <PopoverContent
               side={isMobile ? "bottom" : "right"}

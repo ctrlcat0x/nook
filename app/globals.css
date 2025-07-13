@@ -42,7 +42,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
-html,body,:root {
+html,
+body,
+:root {
   height: 100%;
 }
 :root {

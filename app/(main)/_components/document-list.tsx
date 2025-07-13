@@ -18,6 +18,7 @@ interface DocumentListProps {
 export const DocumentList = ({
   parentDocumentId,
   level = 0,
+  data,
 }: DocumentListProps) => {
   const params = useParams();
   const router = useRouter();
@@ -28,9 +29,16 @@ export const DocumentList = ({
       [documentId]: !prevExpanded[documentId],
     }));
   };
-  const documents = useQuery(api.documents.getSidebar, {
-    parentDocument: parentDocumentId,
-  });
+  const documents =
+    data !== undefined
+      ? data.filter((doc) =>
+          parentDocumentId
+            ? doc.parentDocument === parentDocumentId
+            : !doc.parentDocument
+        )
+      : useQuery(api.documents.getSidebar, {
+          parentDocument: parentDocumentId,
+        });
   const onRedirect = (documentId: string) => {
     router.push(`/documents/${documentId}`);
   };
@@ -70,11 +78,17 @@ export const DocumentList = ({
             docmentIcon={document.icon}
             active={params.documentId === document._id}
             level={level}
+            lastEdited={document.lastEdited}
             onExpand={() => onExpand(document._id)}
             expanded={expanded[document._id]}
+            isFavorite={document.isFavorite}
           />
           {expanded[document._id] && (
-            <DocumentList parentDocumentId={document._id} level={level + 1} />
+            <DocumentList
+              parentDocumentId={document._id}
+              level={level + 1}
+              data={data}
+            />
           )}
         </div>
       ))}
