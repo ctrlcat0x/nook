@@ -29,6 +29,10 @@ export const DocumentList = ({
       [documentId]: !prevExpanded[documentId],
     }));
   };
+  // Always call useQuery unconditionally
+  const sidebarDocs = useQuery(api.documents.getSidebar, {
+    parentDocument: parentDocumentId,
+  });
   const documents =
     data !== undefined
       ? data.filter((doc) =>
@@ -36,9 +40,7 @@ export const DocumentList = ({
             ? doc.parentDocument === parentDocumentId
             : !doc.parentDocument
         )
-      : useQuery(api.documents.getSidebar, {
-          parentDocument: parentDocumentId,
-        });
+      : sidebarDocs;
   const onRedirect = (documentId: string) => {
     router.push(`/documents/${documentId}`);
   };

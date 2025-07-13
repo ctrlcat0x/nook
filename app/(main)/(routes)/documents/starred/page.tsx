@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { File } from "lucide-react";
+import Image from "next/image";
 
 const StarredDocumentsPage = () => {
   const router = useRouter();
@@ -45,7 +46,7 @@ const StarredDocumentsPage = () => {
             >
               {/* Cover image */}
               {doc.coverImage && (
-                <img
+                <Image
                   src={doc.coverImage}
                   alt="cover"
                   className="absolute top-0 left-0 w-full h-20 object-cover rounded-t-lg"

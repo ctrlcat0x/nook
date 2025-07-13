@@ -1,14 +1,7 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import {
-  Clock,
-  Lightbulb,
-  PlusCircle,
-  SquarePen,
-  Star,
-  View,
-} from "lucide-react";
+import { Clock, Lightbulb, SquarePen, Star, View } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -71,7 +64,7 @@ const DocumentsPage = () => {
               >
                 {/* Cover image */}
                 {doc.coverImage && (
-                  <img
+                  <Image
                     src={doc.coverImage}
                     alt="cover"
                     className="absolute top-0 left-0 w-full h-20 object-cover rounded-t-lg"
@@ -136,7 +129,7 @@ const DocumentsPage = () => {
               >
                 {/* Cover image */}
                 {doc.coverImage && (
-                  <img
+                  <Image
                     src={doc.coverImage}
                     alt="cover"
                     className="absolute top-0 left-0 w-full h-20 object-cover rounded-t-lg"
@@ -172,16 +165,16 @@ const DocumentsPage = () => {
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Lightbulb className="text-yellow-500 bg-yellow-100 dark:text-yellow-800 dark:bg-yellow-200 p-2 rounded-full h-10 w-10 mr-1 mt-0.5" />
               <h2 className="text-xl font-semibold">
-                Let's get your thoughts out
+                Let&apos;s get your thoughts out
               </h2>
             </div>
             <p className="text-muted-foreground text-base mb-4 mt-1">
-              &gt; Capture your thoughts, plans, and inspirations in a fresh
-              note. Nook is designed to be your inviting space for creativity,
+              Capture your thoughts, plans, and inspirations in a fresh note.
+              Nook is designed to be your inviting space for creativity,
               reflection, and productivity.
             </p>
             <p className="text-muted-foreground text-base  mb-4 mt-1">
-              &gt; Whether it's a quick idea or a detailed plan, start writing
+              Whether it&apos;s a quick idea or a detailed plan, start writing
               and let your mind flow. Your next big breakthrough could begin
               right here.
             </p>
@@ -192,7 +185,7 @@ const DocumentsPage = () => {
               aria-label="Create a new note"
             >
               <SquarePen className="h-4 w-4 mr-1 mt-0.5" />
-              Let's get your thoughts out
+              Let&apos;s get your thoughts out
             </Button>
           </div>
         </div>
