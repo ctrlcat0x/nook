@@ -7,6 +7,8 @@ import gsap from "gsap";
 import { useUser, SignUpButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
+import { HelpCircle } from "lucide-react";
+
 export const LandingHero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
@@ -161,9 +163,6 @@ export const LandingFeatures = () => {
     </section>
   );
 };
-
-import { User, DollarSign, HelpCircle } from "lucide-react";
-
 // Testimonials Section
 export const LandingTestimonials = () => {
   const testimonialsRef = useRef<HTMLDivElement>(null);
