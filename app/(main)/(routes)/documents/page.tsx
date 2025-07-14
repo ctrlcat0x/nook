@@ -112,7 +112,7 @@ const DocumentsPage = () => {
             ))}
           </div>
         ) : favoriteDocs.length === 0 ? (
-          <div className="flex flex-col justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-8">
             <p className="text-muted-foreground mb-4">
               No starred documents yet.
             </p>

@@ -1,50 +1,66 @@
 "use client";
 
-import { useScrollTop } from "@/hooks/use-scroll-top";
-import { cn } from "@/lib/utils";
-import { Logo } from "./logo";
-import { ModeToggle } from "@/components/mode-toggle";
-import { useConvexAuth } from "convex/react";
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Spinner } from "@/components/spinner";
+import { Logo } from "./logo";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
+import { SignInButton, useUser } from "@clerk/nextjs";
 
-export const Navbar = () => {
-  const { isAuthenticated, isLoading } = useConvexAuth();
-  const scrolled = useScrollTop();
+export const LandingNavbar = () => {
+  const { user } = useUser();
   return (
-    <div
-      className={cn(
-        "z-50 bg-background dark:bg-[#1f1f1f] fixed top-0 flex items-center w-full p-6",
-        scrolled && " shadow-sm"
-      )}
-    >
-      <Logo />
-      <div className="md:ml-auto md:justify-end justify-between w-full flex items-center gap-x-2">
-        {isLoading && <Spinner />}
-        {!isAuthenticated && !isLoading && (
-          <>
+    <nav className="fixed top-0 left-0 w-full z-50 bg-background/60 dark:bg-[#1f1f1f] backdrop-blur border-b border-border/60">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-x-6">
+          <Logo />
+        </div>
+        <div className="hidden md:flex items-center gap-x-6 text-muted-foreground font-medium text-sm">
+          <Link
+            href="#features"
+            className="hover:text-foreground transition"
+            tabIndex={0}
+            aria-label="Features"
+          >
+            Features
+          </Link>
+          <Link
+            href="#pricing"
+            className="hover:text-foreground transition"
+            tabIndex={0}
+            aria-label="Pricing"
+          >
+            Pricing
+          </Link>
+          <a
+            href="https://github.com/ctrlcat0x/nook"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground transition"
+            tabIndex={0}
+            aria-label="GitHub"
+          >
+            GitHub
+          </a>
+        </div>
+        <div className="flex items-center gap-x-2">
+          {!user ? (
             <SignInButton mode="modal">
-              <Button variant="ghost" size="sm">
-                Log in
+              <Button variant="ghost" size="sm" asChild>
+                <span tabIndex={0} aria-label="Log in">
+                  Log in
+                </span>
               </Button>
             </SignInButton>
-            <SignInButton mode="modal">
-              <Button size="sm">Get Nook free</Button>
-            </SignInButton>
-          </>
-        )}
-        {isAuthenticated && !isLoading && (
-          <>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/documents">Enter Nook</Link>
+          ) : (
+            <Button size="sm" asChild>
+              <Link href="/documents" tabIndex={0} aria-label="Go to Nook">
+                Go to Nook
+              </Link>
             </Button>
-            <UserButton afterSignOutUrl="/" />
-          </>
-        )}
-        <ModeToggle />
+          )}
+          <ModeToggle />
+        </div>
       </div>
-    </div>
+    </nav>
   );
 };

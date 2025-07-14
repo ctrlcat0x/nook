@@ -1,15 +1,27 @@
-import { Heading } from "./_components/heading";
-import { Footer } from "./_components/footer";
+import { LandingNavbar } from "./_components/navbar";
+import {
+  LandingHero,
+  LandingFeatures,
+  LandingTestimonials,
+  LandingPricing,
+  LandingFAQ,
+} from "./_components/heading";
+import { LandingFooter } from "./_components/footer";
 
-const landingPage = () => {
+const LandingPage = () => {
   return (
     <div className="min-h-full flex flex-col dark:bg-[#1f1f1f]">
-      <div className="flex flex-col items-center justify-center md:justify-start text-center gap-y-8 flex-1 px-6 pb-10">
-        <Heading />
-      </div>
-      <Footer />
+      <LandingNavbar />
+      <main className="flex-1 flex flex-col justify-center items-center w-full">
+        <LandingHero />
+        <LandingFeatures />
+        <LandingTestimonials />
+        <LandingPricing />
+        <LandingFAQ />
+      </main>
+      <LandingFooter />
     </div>
   );
 };
 
-export default landingPage;
+export default LandingPage;

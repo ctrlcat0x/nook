@@ -424,7 +424,7 @@ export const Navigation = () => {
             (sortedPrivateDocs.length > 0 ? (
               <DocumentList data={sortedPrivateDocs} />
             ) : (
-              <div className="text-xs text-muted-foreground pl-3 pb-2">
+              <div className="text-xs text-muted-foreground text-center pb-2">
                 No private pages
               </div>
             ))}
